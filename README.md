@@ -13,7 +13,6 @@ pip install requirements.txt
 
 ```bash
 python -m service.server
-python -m service.client
 ```
 
 ## Resources
@@ -29,12 +28,17 @@ https://book.systemsapproach.org/applications/infrastructure.html
 https://tools.ietf.org/html/rfc1035
 https://jvns.ca/blog/how-updating-dns-works/
 
-### Debugging
+### Debug
 https://www.wireshark.org/ 
 https://jvns.ca/blog/2018/06/19/what-i-use-wireshark-for/
-
-to tell it to only look at local computer 
-lo1
-
 https://howdns.works
-dig @localhost -p 5353 google.com
+
+to tell it to only look at local computer use `lo0` from `ifconfig`
+
+```bash
+python -m service.server
+sudo tcpdump -i any port 50007 -w output.pcapdig @127.0.0.1 -p 50007 github.yo.com
+dig @127.0.0.1 -p 50007 github.yo.com
+```
+
+
