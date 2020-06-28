@@ -6,7 +6,7 @@
 ```bash
 virtualenv --python=python3.7 venv
 source venv/bin/activate
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Run
@@ -29,7 +29,7 @@ https://tools.ietf.org/html/rfc1035
 https://jvns.ca/blog/how-updating-dns-works/
 
 ### Debug
-https://www.wireshark.org/ 
+https://www.wireshark.org/
 https://jvns.ca/blog/2018/06/19/what-i-use-wireshark-for/
 https://howdns.works
 
@@ -40,5 +40,3 @@ python -m service.server
 sudo tcpdump -i any port 50007 -w output.pcapdig @127.0.0.1 -p 50007 github.yo.com
 dig @127.0.0.1 -p 50007 github.yo.com
 ```
-
-
