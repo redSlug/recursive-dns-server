@@ -4,8 +4,8 @@ QUESTION_BEGINNING_OFFSET = 12
 
 
 class Header:
-    def __init__(self):
-        self.ID = []
+    def __init__(self, id, qr, op_code):
+        self.ID = id
         """
         A 16 bit identifier assigned by the program that generates any kind
         of query.  This identifier is copied the corresponding reply
@@ -13,13 +13,13 @@ class Header:
         to outstanding queries.
         """
 
-        self.QR = False
+        self.QR = qr
         """
         A one bit field that specifies whether this message is a query (0),
         or a response (1).
         """
 
-        self.Opcode = 0
+        self.Opcode = op_code
         """
         A four bit field that specifies kind of query in this
         message.  This value is set by the originator of a query
@@ -62,10 +62,12 @@ class Header:
 
 
 class DNSMessage:
-    def __init__(self, message, address):
+    def __init__(self, message):
         # number of bytes in packet
-        self.count = 0
-        self.header = Header()
+        bits = BitArray(message)
+
+        self.count = len(bits)
+        self.header = Header(id=bits[0:16], qr=bool(bits[16]), op_code=(bits[17:21]).int)
         self.host = self.get_domain_name(message)
         self.ip_address = self.get_ip_address(message)
 
@@ -103,8 +105,6 @@ class DNSMessage:
         return offset_byte
 
     def get_ip_address(self, message):
-        message = b"\xf5\xfa\x81\x80\x00\x01\x00\x01\x00\x00\x00\x01\x06github\x02yo\x03com\x00\x00\x01\x00\x01\xc0\x0c\x00\x01\x00\x01\x00\x00\r\xc1\x00\x04E\xac\xc9\x99\x00\x00)\x02\x00\x00\x00\x00\x00\x00\x00"
-
         offset = self.get_first_answer_offset(message)
         length_of_domain = offset - QUESTION_BEGINNING_OFFSET
 
@@ -114,29 +114,13 @@ class DNSMessage:
         rd_length = int.from_bytes(rd_length, byteorder="little")
         breakpoint()
         print("rd length", rd_length)
-        ip_address = message[offset + 2 : offset + 2 + rd_length]
-        print(ip_address)
-
         # NOTE(bdettmer): for now just getting first answer, but later we can look at ANCOUNT to get
         # the amount of answers and return them all
-
-
-def parseMessage(location):
-    count = 0
-    message = DNSMessage()
-    bits = None
-    with open(fileToRead, "rb") as f:
-        bits = BitArray(f)
-    message.count = len(bits)
-
-    # parse header
-    message.header.ID = bits[0:16]
-    message.header.QR = bits[16]
-    message.header.Opcode = (bits[17:21]).int
-
-    return message
+        ip_address = message[offset + 2 : offset + 2 + rd_length]
+        print(ip_address)
+        return 1
 
 
 if __name__ == "__main__":
-    m = parseMessage("fileToRead")
-    print(m)
+    dummy_message = b"\xf5\xfa\x81\x80\x00\x01\x00\x01\x00\x00\x00\x01\x06github\x02yo\x03com\x00\x00\x01\x00\x01\xc0\x0c\x00\x01\x00\x01\x00\x00\r\xc1\x00\x04E\xac\xc9\x99\x00\x00)\x02\x00\x00\x00\x00\x00\x00\x00"
+    DNSMessage(dummy_message)

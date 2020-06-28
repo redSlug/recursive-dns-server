@@ -9,11 +9,7 @@ from service.request import DNSMessage
 from service.constants import BUFFER_SIZE, HOST, PORT
 
 
-def dig_authority_server(message, human_message):
-    # b's4\x01 \x00\x01\x00\x00\x00\x00\x00\x01\x06github\x02yo\x03com\x00\x00\x01\x00\x01\x00\x00)\x10\x00\x00\x00\x00\x00\x00\x00'
-
-    print(f"human message {human_message}")
-
+def dig_authority_server(message):
     authority_host = "8.8.8.8"
     dns_port = 53
 
@@ -21,8 +17,9 @@ def dig_authority_server(message, human_message):
         s.connect((authority_host, dns_port))
         print("Sending bytes to authority server")
         s.sendall(message)
-        data = s.recv(1024)
-    print(f"Received response {repr(data)}")
+        message = s.recv(BUFFER_SIZE)
+        DNSMessage(message)
+    print(f"Received response {repr(message)}")
 
 
 def run():
@@ -38,9 +35,9 @@ def run():
         while True:
             message, address = s.recvfrom(BUFFER_SIZE)
             print(f"Received {message} from {address}")
-            parsed_message = DNSMessage(message, address)
+            parsed_message = DNSMessage(message)
             print(parsed_message.host)
-            dig_authority_server(message, human_message)
+            dig_authority_server(message)
 
             # Sending a reply to client
             bytes_to_sent = str.encode("yo, I got your message")
