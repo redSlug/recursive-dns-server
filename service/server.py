@@ -1,5 +1,6 @@
 """Basic UDP server that binds to HOST and listens for
-incoming datagrams
+incoming datagrams, parses the message, forwards it to an authority
+DNS server and sends response back
 """
 
 import socket
@@ -9,7 +10,7 @@ from service.request import DNSMessage
 from service.constants import BUFFER_SIZE, HOST, PORT
 
 
-def dig_authority_server(message):
+def query_authority_server(message):
     authority_host = "8.8.8.8"
     dns_port = 53
 
@@ -37,7 +38,7 @@ def run():
             print(f"Received {message} from {address}")
             parsed_message = DNSMessage(message)
             print(parsed_message.host)
-            dig_authority_server(message)
+            query_authority_server(message)
 
             # Sending a reply to client
             bytes_to_sent = str.encode("yo, I got your message")
@@ -46,4 +47,3 @@ def run():
 
 if __name__ == "__main__":
     run()
-DNSMessage

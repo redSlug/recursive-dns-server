@@ -133,8 +133,8 @@ class Question:
     """
     def __init__(self, message):
         self.QNAME = self.get_domain_name(message)
-        self.QTYPE = 'TODO'
-        self.QCLASS = 'TODO'
+        self.QTYPE = self.get_qtype(message)
+        self.QCLASS = self.get_qclass(message)
         self.qname_end_position = self.get_qname_end_position(message)
 
     @staticmethod
@@ -150,6 +150,14 @@ class Question:
             url_parts.append(url_part)
             start_byte = start_byte + length + 1
         return ".".join([p.decode() for p in url_parts])
+
+    def get_qtype(self, message):
+        start = self.get_qname_end_position(message) + 1
+        return message[start:start+2]
+
+    def get_qclass(self, message):
+        start = self.get_qname_end_position(message) + 3
+        return message[start:start+5]
 
     @staticmethod
     def get_qname_end_position(message):
@@ -205,6 +213,6 @@ class DNSMessage:
         answer_beginning = qclass_end
         rd_length = int.from_bytes(self.message[answer_beginning:answer_beginning+1], "big")
         print("rd length", rd_length)
-        ip_address = self.message[offset + 2 : offset + 2 + rd_length]
+        ip_address = self.message[answer_beginning + 2: answer_beginning + rd_length + 2]
         print(ip_address)
-        return 1
+        return ip_address
